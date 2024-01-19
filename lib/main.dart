@@ -40,6 +40,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _codeController = TextEditingController();
   String _selectedOption = 'Create Game';
+  final TextEditingController _timeIntervalController = TextEditingController();
+  final TextEditingController _radiusController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -106,28 +108,93 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                 ),
               ),
+            SizedBox(
+              height: 0.0,
+              width: 300,
+            ),
+
+            // White box
+            if (_selectedOption == 'Create Game')
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10.0),
+                    border: Border.all(
+                      color: Colors.white, // Border color
+                      width: 2.0, // Border width
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // User input time interval
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 10.0),
+                        child: TextField(
+                          controller: _timeIntervalController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Time Interval (minutes)',
+                            labelStyle:
+                                TextStyle(color: Colors.white, fontSize: 20.0),
+                          ),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 0.0),
+
+                      // User input for radius
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 10.0),
+                        child: TextField(
+                          controller: _radiusController,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Radius (kilometers)',
+                            labelStyle:
+                                TextStyle(color: Colors.white, fontSize: 20.0),
+                          ),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.0),
+                    ],
+                  ),
+                ),
+              ),
 
             SizedBox(
-              height: 50.0,
+              height: 20.0,
               width: 300,
-            ), //padding form enter code bar
+            ), // Padding for enter code bar
+
             StartButton(
               nicknameController: _nicknameController,
               codeController: _codeController,
               onPressed: () {
-                //String nickname = _nicknameController.text;
-                String code = _codeController.text;
+                if (_selectedOption == 'Join Game') {
+                } else if (_selectedOption == 'Create Game') {
+                  int timeInterval =
+                      int.tryParse(_timeIntervalController.text) ?? 0;
+                  double radius =
+                      double.tryParse(_radiusController.text) ?? 0.0;
 
-                if (_selectedOption == 'Join Game' && code == '1234') {
-                  // PIN is correct
+                  //map screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapSample(), // Use MapScreen here
+                      builder: (context) => MapSample(),
                     ),
                   );
-                } else {
-                  print('Incorrect PIN');
                 }
               },
             ),
@@ -162,6 +229,3 @@ class StartButton extends StatelessWidget {
     );
   }
 }
-
-
-//request sa servera za "room"
