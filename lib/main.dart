@@ -121,13 +121,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
                     border: Border.all(
-                      color: Colors.white, // Border color
-                      width: 2.0, // Border width
+                      color: Colors.white,
+                      width: 2.0,
                     ),
                   ),
                   child: Column(
                     children: [
-                      // User input time interval
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
@@ -145,10 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-
                       SizedBox(height: 0.0),
-
-                      // User input for radius
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
@@ -180,19 +176,21 @@ class _MyHomePageState extends State<MyHomePage> {
             StartButton(
               nicknameController: _nicknameController,
               codeController: _codeController,
+              radius: double.tryParse(_radiusController.text) ?? 3.0,
               onPressed: () {
                 if (_selectedOption == 'Join Game') {
+                  //logic for joining game
                 } else if (_selectedOption == 'Create Game') {
                   int timeInterval =
                       int.tryParse(_timeIntervalController.text) ?? 0;
                   double radius =
                       double.tryParse(_radiusController.text) ?? 0.0;
 
-                  //map screen
+                  // Navigate to the map screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapSample(),
+                      builder: (context) => MapSample(circleRadius: radius),
                     ),
                   );
                 }
@@ -209,10 +207,12 @@ class StartButton extends StatelessWidget {
   final TextEditingController nicknameController;
   final TextEditingController codeController;
   final VoidCallback onPressed;
+  final double radius;
 
   StartButton({
     required this.nicknameController,
     required this.codeController,
+    required this.radius,
     required this.onPressed,
   });
 

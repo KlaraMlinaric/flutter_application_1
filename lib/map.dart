@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapSample extends StatefulWidget {
-  const MapSample({super.key});
+  const MapSample({Key? key, required this.circleRadius}) : super(key: key);
+
+  final double circleRadius;
 
   @override
   State<MapSample> createState() => MapSampleState();
@@ -19,19 +21,38 @@ class MapSampleState extends State<MapSample> {
   );
 
   static const CameraPosition _kLake = CameraPosition(
-      bearing: 192.8334901395799,
-      target: LatLng(37.43296265331129, -122.08832357078792),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
+    bearing: 192.8334901395799,
+    target: LatLng(37.43296265331129, -122.08832357078792),
+    tilt: 59.440717697143555,
+    zoom: 19.151926040649414,
+  );
+
+  double _currentCircleRadius = 0.0; //track the radius
+
+  @override
+  void initState() {
+    super.initState();
+    _currentCircleRadius = widget.circleRadius; // radius
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: GoogleMap(
-        mapType: MapType.normal, //hybrid
+        mapType: MapType.normal,
         initialCameraPosition: _kGooglePlex,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
+        },
+        circles: <Circle>{
+          Circle(
+            circleId: const CircleId("lake_circle"),
+            center: _kLake.target,
+            radius: _currentCircleRadius * 1000,
+            fillColor: Colors.red.withOpacity(0.3),
+            strokeColor: Colors.red,
+            strokeWidth: 2,
+          ),
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -45,5 +66,12 @@ class MapSampleState extends State<MapSample> {
   Future<void> _goToTheLake() async {
     final GoogleMapController controller = await _controller.future;
     await controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+  }
+
+  // Method to update the circle radius dynamically
+  void updateCircleRadius(double newRadius) {
+    setState(() {
+      _currentCircleRadius = newRadius;
+    });
   }
 }
