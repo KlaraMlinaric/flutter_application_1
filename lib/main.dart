@@ -46,8 +46,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Color(0xFFA1045A),
+        backgroundColor: const Color(0xFFA1045A),
         title: Text(widget.title),
       ),
       body: Center(
@@ -67,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       value: value,
                       child: Text(
                         value,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFA1045A),
                           fontSize: 25.0,
                         ),
@@ -78,14 +79,14 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30.0),
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: TextField(
                 controller: _nicknameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Nickname',
-                  labelStyle: TextStyle(color: Colors.white, fontSize: 25.0),
+                  labelStyle: TextStyle(color: Colors.white, fontSize: 20.0),
                 ),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 25.0,
                 ),
@@ -95,20 +96,20 @@ class _MyHomePageState extends State<MyHomePage> {
             // Enter code
             if (_selectedOption == 'Join Game')
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: TextField(
                   controller: _codeController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter Code',
                     labelStyle: TextStyle(color: Colors.white, fontSize: 25.0),
                   ),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 25.0,
                   ),
                 ),
               ),
-            SizedBox(
+            const SizedBox(
               height: 0.0,
               width: 300,
             ),
@@ -116,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // White box
             if (_selectedOption == 'Create Game')
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
@@ -129,50 +130,49 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       // User input time interval
                       Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
                         child: TextField(
                           controller: _timeIntervalController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Time Interval (minutes)',
                             labelStyle:
                                 TextStyle(color: Colors.white, fontSize: 20.0),
                           ),
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20.0,
                           ),
                         ),
                       ),
 
-                      SizedBox(height: 0.0),
 
                       // User input for radius
                       Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
                         child: TextField(
                           controller: _radiusController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Radius (kilometers)',
                             labelStyle:
                                 TextStyle(color: Colors.white, fontSize: 20.0),
                           ),
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20.0,
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                     ],
                   ),
                 ),
               ),
 
-            SizedBox(
+            const SizedBox(
               height: 20.0,
               width: 300,
             ), // Padding for enter code bar
@@ -220,7 +220,7 @@ class StartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      child: Text(
+      child: const Text(
         'Start Game',
         style: TextStyle(
           fontSize: 25.0,
