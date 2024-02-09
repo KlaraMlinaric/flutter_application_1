@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapSample extends StatefulWidget {
+  //const MapSample({super.key, required double circleRadius});
   const MapSample({Key? key, required this.circleRadius}) : super(key: key);
 
   final double circleRadius;
@@ -20,13 +21,6 @@ class MapSampleState extends State<MapSample> {
     zoom: 14.4746,
   );
 
-  static const CameraPosition _kLake = CameraPosition(
-    bearing: 192.8334901395799,
-    target: LatLng(37.43296265331129, -122.08832357078792),
-    tilt: 59.440717697143555,
-    zoom: 19.151926040649414,
-  );
-
   double _currentCircleRadius = 0.0; //track the radius
 
   @override
@@ -39,7 +33,7 @@ class MapSampleState extends State<MapSample> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GoogleMap(
-        mapType: MapType.normal,
+        mapType: MapType.normal, //hybrid
         initialCameraPosition: _kGooglePlex,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
@@ -47,7 +41,7 @@ class MapSampleState extends State<MapSample> {
         circles: <Circle>{
           Circle(
             circleId: const CircleId("lake_circle"),
-            center: _kLake.target,
+            center: _kGooglePlex.target,
             radius: _currentCircleRadius * 1000,
             fillColor: Colors.red.withOpacity(0.3),
             strokeColor: Colors.red,
@@ -65,7 +59,8 @@ class MapSampleState extends State<MapSample> {
 
   Future<void> _goToTheLake() async {
     final GoogleMapController controller = await _controller.future;
-    await controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
+    await controller
+        .animateCamera(CameraUpdate.newCameraPosition(_kGooglePlex));
   }
 
   // Method to update the circle radius dynamically

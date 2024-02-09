@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'map.dart';
-import 'request.dart';
 import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
@@ -122,12 +121,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
                     border: Border.all(
-                      color: Colors.white,
-                      width: 2.0,
+                      color: Colors.white, // Border color
+                      width: 2.0, // Border width
                     ),
                   ),
                   child: Column(
                     children: [
+                      // User input time interval
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
@@ -145,7 +145,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
+
                       SizedBox(height: 0.0),
+
+                      // User input for radius
                       Padding(
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
@@ -177,21 +180,24 @@ class _MyHomePageState extends State<MyHomePage> {
             StartButton(
               nicknameController: _nicknameController,
               codeController: _codeController,
+              radius: double.tryParse(_radiusController.text) ?? 3.0,
               onPressed: () {
                 if (_selectedOption == 'Join Game') {
+                  //logic for joining game
                 } else if (_selectedOption == 'Create Game') {
                   int timeInterval =
                       int.tryParse(_timeIntervalController.text) ?? 0;
                   double radius =
                       double.tryParse(_radiusController.text) ?? 0.0;
-                  var code = await newGame(_codeController.text, _nicknameController.text, timeInterval, radius);
-                }
 
                   //map screen
+                  // Navigate to the map screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MapSample(circleRadius: radius),
+                      builder: (context) => MapSample(
+                        circleRadius: radius,
+                      ),
                     ),
                   );
                 }
