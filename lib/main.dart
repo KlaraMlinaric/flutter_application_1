@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'map.dart';
-import 'request.dart';
 import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
@@ -181,21 +180,15 @@ class _MyHomePageState extends State<MyHomePage> {
             StartButton(
               nicknameController: _nicknameController,
               codeController: _codeController,
-              onPressed: () async{
-                int? code;
-
+              onPressed: () {
                 if (_selectedOption == 'Join Game') {
-                  var code = await joinGame(_codeController.text, _nicknameController.text);
                 } else if (_selectedOption == 'Create Game') {
                   int timeInterval =
                       int.tryParse(_timeIntervalController.text) ?? 0;
                   double radius =
                       double.tryParse(_radiusController.text) ?? 0.0;
-                  var code = await newGame(_codeController.text, _nicknameController.text, timeInterval, radius);
-                }
 
-                //map screen
-                if(code==200){
+                  //map screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
