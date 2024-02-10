@@ -17,6 +17,7 @@ class MapSampleState extends State<MapSample> {
       Completer<GoogleMapController>();
 
   static const CameraPosition _kGooglePlex = CameraPosition(
+    //hunter position
     target: LatLng(37.42796133580664, -122.085749655962),
     zoom: 14.4746,
   );
@@ -31,6 +32,15 @@ class MapSampleState extends State<MapSample> {
 
   @override
   Widget build(BuildContext context) {
+    var markers = {
+      Marker(
+        markerId: const MarkerId('1'),
+        position: const LatLng(37.42, -122.08),
+        icon: BitmapDescriptor.defaultMarkerWithHue(
+          BitmapDescriptor.hueBlue,
+        ),
+      ),
+    };
     return Scaffold(
       body: GoogleMap(
         mapType: MapType.normal, //hybrid
@@ -38,6 +48,8 @@ class MapSampleState extends State<MapSample> {
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
+        markers: markers,
+
         circles: <Circle>{
           Circle(
             circleId: const CircleId("lake_circle"),
@@ -49,19 +61,20 @@ class MapSampleState extends State<MapSample> {
           ),
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToTheLake,
-        label: const Text('To the lake!'),
-        icon: const Icon(Icons.directions_boat),
-      ),
+
+      ///floatingActionButton: FloatingActionButton.extended(
+      ///onPressed: _goToTheLake,
+      ///label: const Text('To the lake!'),
+      ///icon: const Icon(Icons.directions_boat),
+      ///),
     );
   }
 
-  Future<void> _goToTheLake() async {
-    final GoogleMapController controller = await _controller.future;
-    await controller
-        .animateCamera(CameraUpdate.newCameraPosition(_kGooglePlex));
-  }
+  ///Future<void> _goToTheLake() async {
+  //final GoogleMapController controller = await _controller.future;
+  //await controller
+  //.animateCamera(CameraUpdate.newCameraPosition(_kGooglePlex));
+  //}
 
   // Method to update the circle radius dynamically
   void updateCircleRadius(double newRadius) {

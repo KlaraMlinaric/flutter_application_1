@@ -65,5 +65,3 @@ class _LoadState extends State<Load> with SingleTickerProviderStateMixin {
     );
   }
 }
-
-// ima sad tu nekakav poč bijeli screen nez
