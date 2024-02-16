@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
 import 'map.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
+void toast(msg){
+  Fluttertoast.showToast(
+    msg: msg,
+    toastLength: Toast.LENGTH_SHORT,
+    gravity: ToastGravity.CENTER,
+    backgroundColor: Colors.red,
+    textColor: Colors.white,
+    fontSize: 16.0
+  );
+}
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Required by FlutterConfig for maps
@@ -9,6 +21,7 @@ void main() async {
 
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key});
@@ -180,14 +193,44 @@ class _MyHomePageState extends State<MyHomePage> {
             StartButton(
               nicknameController: _nicknameController,
               codeController: _codeController,
-              onPressed: () {
-                if (_selectedOption == 'Join Game') {
-                } else if (_selectedOption == 'Create Game') {
-                  int timeInterval =
-                      int.tryParse(_timeIntervalController.text) ?? 0;
-                  double radius =
-                      double.tryParse(_radiusController.text) ?? 0.0;
+              onPressed: () async{
 
+
+                if (_selectedOption == 'Join Game') {
+                  
+                  var url = Uri.http("${_codeController.text}:8000", "join_game");
+                  var body = {"username": _nicknameController.text};
+                  
+                  try {
+                    var response = await http.post(url, body: body);
+
+                    //odi na sljedeci ekran
+
+
+                  } catch(err) {
+                    toast("Server not found!");
+                  }
+                }
+                
+                else if (_selectedOption == 'Create Game') {
+
+                  var url = Uri.http("$_codeController:8000", "new_game");
+                  var body = {
+                    "username": _nicknameController,
+                    "timeInterval": int.tryParse(_timeIntervalController.text) ?? 0,
+                    "radius": double.tryParse(_radiusController.text) ?? 0.0
+                    };
+                  
+                  try {
+                    var response = await http.post(url, body: body);
+
+                    // odi na sljedeci ekran
+
+
+                  } catch(err) {
+                    toast("Server not found!");
+                  }
+                  
                   //map screen
                   Navigator.push(
                     context,
@@ -196,6 +239,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   );
                 }
+
+
               },
             ),
           ],
