@@ -4,6 +4,14 @@ import 'package:flutter_config/flutter_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
+
+
+
+// dali se loading opce koristi???
+
+
+
+
 void toast(msg){
   Fluttertoast.showToast(
     msg: msg,
@@ -197,7 +205,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
                 if (_selectedOption == 'Join Game') {
-                  
+                  String ip = _codeController.text;
+
                   var body = {"username": _nicknameController.text};
                   
                   try {
@@ -211,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                          builder: (context) => const MapSample(seeker: false),
+                          builder: (context) => MapSample(ip: ip, seeker: false),
                           ),
                         );
                       }
@@ -234,11 +243,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 }
                 
                 else if (_selectedOption == 'Create Game') {
+                  String ip = _codeController.text;
 
+                  double radius = double.tryParse(_radiusController.text) ?? 0.0;
+                  int timeInterval = int.tryParse(_timeIntervalController.text) ?? 0;
+                  
                   var body = {
                     "username": _nicknameController,
-                    "timeInterval": int.tryParse(_timeIntervalController.text) ?? 0,
-                    "radius": double.tryParse(_radiusController.text) ?? 0.0
+                    "timeInterval": timeInterval,
+                    "radius": radius
                     };
                   
                   try {
@@ -252,7 +265,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                          builder: (context) => const MapSample(seeker: true),
+                          builder: (context) => MapSample(
+                            ip: ip,
+                            seeker: true,
+                            radius: radius,
+                            timeInterval: timeInterval,
+                            ),
                           ),
                         );
                       }
