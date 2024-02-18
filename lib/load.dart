@@ -38,7 +38,7 @@ class _LoadState extends State<Load> with SingleTickerProviderStateMixin {
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFA1045A), const Color(0xff303030)],
+            colors: [Color(0xFFA1045A), Color(0xff303030)],
             end: Alignment.bottomLeft,
             begin: Alignment.topRight,
           ),

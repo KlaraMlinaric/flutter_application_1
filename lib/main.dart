@@ -24,14 +24,14 @@ void main() async {
 
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFFA1045A)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFA1045A)),
         scaffoldBackgroundColor: const Color(0xff303030),
         useMaterial3: true,
       ),
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title});
+  const MyHomePage({super.key, required this.title});
 
   final String title;
 
@@ -198,23 +198,43 @@ class _MyHomePageState extends State<MyHomePage> {
 
                 if (_selectedOption == 'Join Game') {
                   
-                  var url = Uri.http("${_codeController.text}:8000", "join_game");
                   var body = {"username": _nicknameController.text};
                   
                   try {
+                    var url = Uri.http("${_codeController.text}:8000", "join_game");
                     var response = await http.post(url, body: body);
 
-                    //odi na sljedeci ekran
+                    switch(response.statusCode){
+                      case 200: {
+                        if (!mounted) return;
 
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => const MapSample(seeker: false),
+                          ),
+                        );
+                      }
+                      break;
+
+                      case 400: {
+                        toast("Ime se već koristi");
+                      }
+                      break;
+
+                      default: {
+                        toast("Nepoznati problem");
+                      }
+                      break;
+                    }
 
                   } catch(err) {
-                    toast("Server not found!");
+                    toast("Server nije pronađen");
                   }
                 }
                 
                 else if (_selectedOption == 'Create Game') {
 
-                  var url = Uri.http("$_codeController:8000", "new_game");
                   var body = {
                     "username": _nicknameController,
                     "timeInterval": int.tryParse(_timeIntervalController.text) ?? 0,
@@ -222,25 +242,37 @@ class _MyHomePageState extends State<MyHomePage> {
                     };
                   
                   try {
+                    var url = Uri.http("$_codeController:8000", "new_game");
                     var response = await http.post(url, body: body);
 
-                    // odi na sljedeci ekran
+                    switch(response.statusCode){
+                      case 200: {
+                        if (!mounted) return;
 
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => const MapSample(seeker: true),
+                          ),
+                        );
+                      }
+                      break;
+
+                      case 400: {
+                        toast("Ime se već koristi");
+                      }
+                      break;
+
+                      default: {
+                        toast("Nepoznati problem");
+                      }
+                      break;
+                    }
 
                   } catch(err) {
-                    toast("Server not found!");
+                    toast("Server nije pronađen");
                   }
-                  
-                  //map screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MapSample(),
-                    ),
-                  );
                 }
-
-
               },
             ),
           ],
@@ -255,7 +287,8 @@ class StartButton extends StatelessWidget {
   final TextEditingController codeController;
   final VoidCallback onPressed;
 
-  StartButton({
+  const StartButton({
+    super.key,
     required this.nicknameController,
     required this.codeController,
     required this.onPressed,
