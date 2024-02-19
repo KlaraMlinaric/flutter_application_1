@@ -94,7 +94,7 @@ class MapSampleState extends State<MapSample> {
   @override
   void initState() {
     super.initState();
-    _currentCircleRadius = widget.circleRadius;
+    _currentCircleRadius = widget.radius ?? 10.0;
     if (userLocations.isNotEmpty) {
       _circlePosition = userLocations[0]['location'];
     }

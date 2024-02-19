@@ -304,13 +304,11 @@ class StartButton extends StatelessWidget {
   final TextEditingController nicknameController;
   final TextEditingController codeController;
   final VoidCallback onPressed;
-  final double radius;
 
   const StartButton({
     super.key,
     required this.nicknameController,
     required this.codeController,
-    required this.radius,
     required this.onPressed,
   });
 
