@@ -183,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
               radius: double.tryParse(_radiusController.text) ?? 3.0,
               onPressed: () {
                 if (_selectedOption == 'Join Game') {
-                  //logic for joining game
+                  //logic for joining game, same mapp screen just pass form server time interval and radius if possible, or do that in map screen so no double files
                 } else if (_selectedOption == 'Create Game') {
                   int timeInterval =
                       int.tryParse(_timeIntervalController.text) ?? 0;
