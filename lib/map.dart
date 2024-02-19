@@ -17,6 +17,8 @@ class MapSampleState extends State<MapSample> {
 
   double _currentCircleRadius = 0.0;
 
+  LatLng _circlePosition = LatLng(0, 0);
+
   List<Map<String, dynamic>> userLocations = [
     {
       "username": "blabla",
@@ -47,14 +49,18 @@ class MapSampleState extends State<MapSample> {
   void initState() {
     super.initState();
     _currentCircleRadius = widget.circleRadius;
+    if (userLocations.isNotEmpty) {
+      _circlePosition = userLocations[0]['location'];
+    }
+    //updating locations
+    Timer.periodic(Duration(minutes: 1), (Timer timer) {
+      // call function to update user locations
+      updateFirstUserLocation(); // demo x
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    LatLng player0Location = userLocations.isNotEmpty
-        ? userLocations[0]['location']
-        : LatLng(0, 0); // Default to (0, 0) if userLocations is empty
-
     Set<Marker> markers = {};
     for (var i = 0; i < userLocations.length; i++) {
       var location = userLocations[i];
@@ -72,7 +78,7 @@ class MapSampleState extends State<MapSample> {
       body: GoogleMap(
         mapType: MapType.normal,
         initialCameraPosition: CameraPosition(
-          target: player0Location, // camera position to player0's location
+          target: _circlePosition, // camera position to the circle's position
           zoom: 14.0,
         ),
         onMapCreated: (GoogleMapController controller) {
@@ -83,7 +89,7 @@ class MapSampleState extends State<MapSample> {
           Circle(
             circleId: const CircleId("player0_circle"),
             center:
-                player0Location, // Set center of the circle to player0's location
+                _circlePosition, // center of the circle to the circle's position(player0 start position)
             radius: _currentCircleRadius * 1000,
             fillColor: Colors.red.withOpacity(0.3),
             strokeColor: Colors.red,
@@ -92,6 +98,13 @@ class MapSampleState extends State<MapSample> {
         },
       ),
     );
+  }
+
+  void updateFirstUserLocation() {
+    setState(() {
+      // update first user's location
+      userLocations[0]['location'] = LatLng(40.0, -120.0); // New coordinates x
+    });
   }
 
   void updateCircleRadius(double newRadius) {
