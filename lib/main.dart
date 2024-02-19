@@ -1,7 +1,27 @@
 import 'package:flutter/material.dart';
 import 'map.dart';
 import 'package:flutter_config/flutter_config.dart';
+import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
 
+
+
+
+// dali se loading opce koristi???
+
+
+
+
+void toast(msg){
+  Fluttertoast.showToast(
+    msg: msg,
+    toastLength: Toast.LENGTH_SHORT,
+    gravity: ToastGravity.CENTER,
+    backgroundColor: Colors.red,
+    textColor: Colors.white,
+    fontSize: 16.0
+  );
+}
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Required by FlutterConfig for maps
@@ -10,15 +30,16 @@ void main() async {
   runApp(const MyApp());
 }
 
+
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFFA1045A)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFA1045A)),
         scaffoldBackgroundColor: const Color(0xff303030),
         useMaterial3: true,
       ),
@@ -28,7 +49,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title});
+  const MyHomePage({super.key, required this.title});
 
   final String title;
 
@@ -46,8 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        backgroundColor: Color(0xFFA1045A),
+        backgroundColor: const Color(0xFFA1045A),
         title: Text(widget.title),
       ),
       body: Center(
@@ -67,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       value: value,
                       child: Text(
                         value,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Color(0xFFA1045A),
                           fontSize: 25.0,
                         ),
@@ -78,14 +100,14 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 30.0),
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: TextField(
                 controller: _nicknameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Nickname',
-                  labelStyle: TextStyle(color: Colors.white, fontSize: 25.0),
+                  labelStyle: TextStyle(color: Colors.white, fontSize: 20.0),
                 ),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 25.0,
                 ),
@@ -95,20 +117,20 @@ class _MyHomePageState extends State<MyHomePage> {
             // Enter code
             if (_selectedOption == 'Join Game')
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.0),
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: TextField(
                   controller: _codeController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Enter Code',
                     labelStyle: TextStyle(color: Colors.white, fontSize: 25.0),
                   ),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 25.0,
                   ),
                 ),
               ),
-            SizedBox(
+            const SizedBox(
               height: 0.0,
               width: 300,
             ),
@@ -116,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // White box
             if (_selectedOption == 'Create Game')
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10.0),
@@ -129,50 +151,49 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       // User input time interval
                       Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
                         child: TextField(
                           controller: _timeIntervalController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Time Interval (minutes)',
                             labelStyle:
                                 TextStyle(color: Colors.white, fontSize: 20.0),
                           ),
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20.0,
                           ),
                         ),
                       ),
 
-                      SizedBox(height: 0.0),
 
                       // User input for radius
                       Padding(
-                        padding: EdgeInsets.symmetric(
+                        padding: const EdgeInsets.symmetric(
                             horizontal: 20.0, vertical: 10.0),
                         child: TextField(
                           controller: _radiusController,
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Radius (kilometers)',
                             labelStyle:
                                 TextStyle(color: Colors.white, fontSize: 20.0),
                           ),
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20.0,
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                     ],
                   ),
                 ),
               ),
 
-            SizedBox(
+            const SizedBox(
               height: 20.0,
               width: 300,
             ), // Padding for enter code bar
@@ -180,26 +201,95 @@ class _MyHomePageState extends State<MyHomePage> {
             StartButton(
               nicknameController: _nicknameController,
               codeController: _codeController,
-              radius: double.tryParse(_radiusController.text) ?? 3.0,
-              onPressed: () {
-                if (_selectedOption == 'Join Game') {
-                  //logic for joining game, same mapp screen just pass form server time interval and radius if possible, or do that in map screen so no double files
-                } else if (_selectedOption == 'Create Game') {
-                  int timeInterval =
-                      int.tryParse(_timeIntervalController.text) ?? 0;
-                  double radius =
-                      double.tryParse(_radiusController.text) ?? 0.0;
+              onPressed: () async{
 
-                  //map screen
-                  // Navigate to the map screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MapSample(
-                        circleRadius: radius,
-                      ),
-                    ),
-                  );
+
+                if (_selectedOption == 'Join Game') {
+                  String ip = _codeController.text;
+
+                  var body = {"username": _nicknameController.text};
+                  
+                  try {
+                    var url = Uri.http("${_codeController.text}:8000", "join_game");
+                    var response = await http.post(url, body: body);
+
+                    switch(response.statusCode){
+                      case 200: {
+                        if (!mounted) return;
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => MapSample(ip: ip, seeker: false),
+                          ),
+                        );
+                      }
+                      break;
+
+                      case 400: {
+                        toast("Ime se već koristi");
+                      }
+                      break;
+
+                      default: {
+                        toast("Nepoznati problem");
+                      }
+                      break;
+                    }
+
+                  } catch(err) {
+                    toast("Server nije pronađen");
+                  }
+                }
+                
+                else if (_selectedOption == 'Create Game') {
+                  String ip = _codeController.text;
+
+                  double radius = double.tryParse(_radiusController.text) ?? 0.0;
+                  int timeInterval = int.tryParse(_timeIntervalController.text) ?? 0;
+                  
+                  var body = {
+                    "username": _nicknameController,
+                    "timeInterval": timeInterval,
+                    "radius": radius
+                    };
+                  
+                  try {
+                    var url = Uri.http("$_codeController:8000", "new_game");
+                    var response = await http.post(url, body: body);
+
+                    switch(response.statusCode){
+                      case 200: {
+                        if (!mounted) return;
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => MapSample(
+                            ip: ip,
+                            seeker: true,
+                            radius: radius,
+                            timeInterval: timeInterval,
+                            ),
+                          ),
+                        );
+                      }
+                      break;
+
+                      case 400: {
+                        toast("Ime se već koristi");
+                      }
+                      break;
+
+                      default: {
+                        toast("Nepoznati problem");
+                      }
+                      break;
+                    }
+
+                  } catch(err) {
+                    toast("Server nije pronađen");
+                  }
                 }
               },
             ),
@@ -216,7 +306,8 @@ class StartButton extends StatelessWidget {
   final VoidCallback onPressed;
   final double radius;
 
-  StartButton({
+  const StartButton({
+    super.key,
     required this.nicknameController,
     required this.codeController,
     required this.radius,
@@ -227,7 +318,7 @@ class StartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      child: Text(
+      child: const Text(
         'Start Game',
         style: TextStyle(
           fontSize: 25.0,

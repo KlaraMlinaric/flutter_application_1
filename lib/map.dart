@@ -1,19 +1,65 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+//import 'package:http/http.dart';
+import 'package:location/location.dart';
 
 class MapSample extends StatefulWidget {
-  const MapSample({Key? key, required this.circleRadius}) : super(key: key);
 
-  final double circleRadius;
+  const MapSample(
+      {super.key,
+      required this.ip,
+      required this.seeker,
+      this.radius,
+      this.timeInterval});
+
+  final String ip;
+  final bool seeker;
+  final double? radius;
+  final int? timeInterval;
+
 
   @override
   State<MapSample> createState() => MapSampleState();
 }
 
+
+
+
+// STATE!!!
 class MapSampleState extends State<MapSample> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+  static const double defaultZoom = 15.0;
+
+
+  LocationData? currentLocation;
+  void getCurrentLocation() async {
+    Location location = Location();
+    location.getLocation().then(
+      (location) {
+        currentLocation = location;
+      },
+    );
+    GoogleMapController googleMapController = await _controller.future;
+    location.onLocationChanged.listen(
+      (newLoc) {
+        currentLocation = newLoc;
+        googleMapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              zoom: defaultZoom,
+              target: LatLng(
+                newLoc.latitude!,
+                newLoc.longitude!,
+              ),
+            ),
+          ),
+        );
+        setState(() {});
+      },
+    );
+  }
 
   double _currentCircleRadius = 0.0;
 
@@ -59,6 +105,9 @@ class MapSampleState extends State<MapSample> {
     });
   }
 
+
+
+  // BUILD !!!
   @override
   Widget build(BuildContext context) {
     Set<Marker> markers = {};
@@ -75,6 +124,7 @@ class MapSampleState extends State<MapSample> {
       );
     }
     return Scaffold(
+
       body: GoogleMap(
         mapType: MapType.normal,
         initialCameraPosition: CameraPosition(
