@@ -1,27 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'map.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:http/http.dart' as http;
-import 'package:fluttertoast/fluttertoast.dart';
-
-
+import 'package:flutter_application_1/toast.dart';
 
 
 // dali se loading opce koristi???
 
 
-
-
-void toast(msg){
-  Fluttertoast.showToast(
-    msg: msg,
-    toastLength: Toast.LENGTH_SHORT,
-    gravity: ToastGravity.CENTER,
-    backgroundColor: Colors.red,
-    textColor: Colors.white,
-    fontSize: 16.0
-  );
-}
 void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Required by FlutterConfig for maps
@@ -115,21 +102,20 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
 
             // Enter code
-            if (_selectedOption == 'Join Game')
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                child: TextField(
-                  controller: _codeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Enter Code',
-                    labelStyle: TextStyle(color: Colors.white, fontSize: 25.0),
-                  ),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 25.0,
-                  ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: TextField(
+                controller: _codeController,
+                decoration: const InputDecoration(
+                  labelText: 'Enter Code',
+                  labelStyle: TextStyle(color: Colors.white, fontSize: 25.0),
+                ),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 25.0,
                 ),
               ),
+            ),
             const SizedBox(
               height: 0.0,
               width: 300,
@@ -201,94 +187,70 @@ class _MyHomePageState extends State<MyHomePage> {
             StartButton(
               nicknameController: _nicknameController,
               codeController: _codeController,
+
               onPressed: () async{
-
-
-                if (_selectedOption == 'Join Game') {
-                  String ip = _codeController.text;
-
-                  var body = {"username": _nicknameController.text};
+                String nickname = _nicknameController.text;
+                String ip = _codeController.text;
+                String radius = _radiusController.text;
+                String timeInterval = _timeIntervalController.text;
                   
-                  try {
-                    var url = Uri.http("${_codeController.text}:8000", "join_game");
-                    var response = await http.post(url, body: body);
+                if(radius == "") radius = "0";
+                if(timeInterval == "") timeInterval = "5";
 
-                    switch(response.statusCode){
-                      case 200: {
-                        if (!mounted) return;
+                Map body;
+                Uri url;
+                http.Response? response;
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                          builder: (context) => MapSample(ip: ip, seeker: false),
-                          ),
-                        );
-                      }
-                      break;
-
-                      case 400: {
-                        toast("Ime se već koristi");
-                      }
-                      break;
-
-                      default: {
-                        toast("Nepoznati problem");
-                      }
-                      break;
-                    }
-
-                  } catch(err) {
-                    toast("Server nije pronađen");
-                  }
-                }
-                
-                else if (_selectedOption == 'Create Game') {
-                  String ip = _codeController.text;
-
-                  double radius = double.tryParse(_radiusController.text) ?? 0.0;
-                  int timeInterval = int.tryParse(_timeIntervalController.text) ?? 0;
-                  
-                  var body = {
-                    "username": _nicknameController,
+                if(_selectedOption == 'Create Game'){
+                  url = Uri.http("$ip:8000", "new_game");
+                  body = {
+                    "username": nickname,
                     "timeInterval": timeInterval,
                     "radius": radius
-                    };
-                  
-                  try {
-                    var url = Uri.http("$_codeController:8000", "new_game");
-                    var response = await http.post(url, body: body);
+                  };
+                }else{
+                  url = Uri.http("$ip:8000", "join_game");
+                  body = {
+                    "username": nickname
+                  };
+                }
+                
+                try {
+                  response = await http.post(url, body: body);
+                } catch(err) {
+                  toast("Server nije pronađen");
+                }
 
-                    switch(response.statusCode){
-                      case 200: {
-                        if (!mounted) return;
+                if(response != null){
+                  switch(response.statusCode){
+                    case 200: {
+                      Map settings = jsonDecode(response.body);
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                          builder: (context) => MapSample(
-                            ip: ip,
-                            seeker: true,
-                            radius: radius,
-                            timeInterval: timeInterval,
-                            ),
+                      if (!mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) => MapSample(
+                          username: nickname,
+                          ip: ip,
+                          seeker: _selectedOption == "Create Game",
+                          radius: settings["radius"],
+                          timeInterval: settings["timeInterval"],
                           ),
-                        );
-                      }
-                      break;
-
-                      case 400: {
-                        toast("Ime se već koristi");
-                      }
-                      break;
-
-                      default: {
-                        toast("Nepoznati problem");
-                      }
-                      break;
+                        ),
+                      );
                     }
+                    break;
 
-                  } catch(err) {
-                    toast("Server nije pronađen");
+                    case 400: {
+                      toast("Ime se već koristi");
+                    }
+                    break;
+
+                    default: {
+                      toast("Nepoznati problem");
+                    }
+                    break;
                   }
                 }
               },

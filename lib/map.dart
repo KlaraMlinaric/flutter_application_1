@@ -1,22 +1,25 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-//import 'package:http/http.dart';
+import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
+import 'package:flutter_application_1/toast.dart';
 
 class MapSample extends StatefulWidget {
 
   const MapSample(
       {super.key,
+      required this.username,
       required this.ip,
       required this.seeker,
-      this.radius,
-      this.timeInterval});
+      required this.radius,
+      required this.timeInterval});
 
+  final String username;
   final String ip;
   final bool seeker;
-  final double? radius;
-  final int? timeInterval;
+  final double radius;
+  final int timeInterval;
 
 
   @override
@@ -61,22 +64,13 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
+
+
   double _currentCircleRadius = 0.0;
 
-  LatLng _circlePosition = LatLng(0, 0);
+  LatLng _circlePosition = const LatLng(0, 0);
 
-  List<Map<String, dynamic>> userLocations = [
-    {
-      "username": "blabla",
-      "location": LatLng(39.42796133580664, -122.085749655962),
-      "address": "adreda ide tu"
-    },
-    {
-      "username": "blabladva",
-      "location": LatLng(37.42796133580664, -122.085749655962),
-      "address": "adreda ide tu"
-    },
-  ];
+  List<Map<String, dynamic>> userLocations = [];
 
   List<BitmapDescriptor> pinIcons = [
     BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
@@ -91,17 +85,38 @@ class MapSampleState extends State<MapSample> {
     BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
   ];
 
+
   @override
   void initState() {
     super.initState();
-    _currentCircleRadius = widget.radius ?? 10.0;
+    _currentCircleRadius = widget.radius;
     if (userLocations.isNotEmpty) {
       _circlePosition = userLocations[0]['location'];
     }
     //updating locations
-    Timer.periodic(Duration(minutes: 1), (Timer timer) {
+    Timer.periodic(Duration(minutes: widget.timeInterval), (Timer timer) async{
       // call function to update user locations
-      updateFirstUserLocation(); // demo x
+      var url = Uri.http("${widget.ip}:8000", "locations");
+      
+      Map body = {
+        "username": widget.username,
+        "location": "${currentLocation!.latitude!} ${currentLocation!.longitude!}",
+        //mozda dodam address ak mi se bude dalo :/
+        "address": ""
+      };
+
+      http.Response? response;
+      try{
+        response = await http.post(url, body: body);
+      } catch (err){
+        toast("Server nije pronađen");
+      }
+      
+      if(response != null && response.statusCode == 400){
+         toast("Nije moguće poslati lokaciju");
+      }
+      
+      // jos treba dohvatit ostale lokacije
     });
   }
 
@@ -150,12 +165,6 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
-  void updateFirstUserLocation() {
-    setState(() {
-      // update first user's location
-      userLocations[0]['location'] = LatLng(40.0, -120.0); // New coordinates x
-    });
-  }
 
   void updateCircleRadius(double newRadius) {
     setState(() {
