@@ -5,22 +5,28 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:flutter_application_1/toast.dart';
+import 'package:geocoding/geocoding.dart' show Placemark, placemarkFromCoordinates;
 
 class MapSample extends StatefulWidget {
 
-  const MapSample(
-      {super.key,
-      required this.username,
-      required this.ip,
-      required this.seeker,
-      required this.radius,
-      required this.timeInterval});
+  const MapSample({
+    super.key,
+    required this.username,
+    required this.ip,
+
+    required this.startLoc,
+    required this.radius,
+    required this.timeInterval,
+    required this.seeker,
+    });
 
   final String username;
   final String ip;
-  final bool seeker;
+
+  final String startLoc;
   final double radius;
   final int timeInterval;
+  final String seeker;
 
 
   @override
@@ -47,8 +53,7 @@ class MapSampleState extends State<MapSample> {
 
   double _currentCircleRadius = 0.0;
   LatLng _circlePosition = const LatLng(0, 0);
-  Map<String, Map<String, String>> userLocations = {};
-  LocationData? currentLocation;
+  Map<String, dynamic> userLocations = {};
 
 
 
@@ -60,16 +65,14 @@ class MapSampleState extends State<MapSample> {
   void initState() {
     super.initState();
 
-    getCurrentLocation();
-
     _currentCircleRadius = widget.radius;
-    _circlePosition = LatLng(currentLocation!.latitude!, currentLocation!.longitude!);
+    List<String> coords = widget.startLoc.split(" ");
+    _circlePosition = LatLng(double.parse(coords[0]), double.parse(coords[1]));
 
     
     Timer.periodic(const Duration(seconds: 10), (Timer timer) async{
       // call function to update user locations
       sendMyLocation();
-      //getOtherLocations(url);
     });
   }
 
@@ -81,10 +84,9 @@ class MapSampleState extends State<MapSample> {
   Widget build(BuildContext context) {
     Set<Marker> markers = {};
 
-    // add other users
     int i=0;
     for (var location in userLocations.entries) {
-      if(location.value["location"] != null){
+      if(location.value["location"] != null && location.key != widget.username){
         
         List<String> coords = location.value["location"]!.split(" ");
         LatLng latLng = LatLng(double.parse(coords[0]), double.parse(coords[1]));
@@ -107,10 +109,9 @@ class MapSampleState extends State<MapSample> {
     }
     return Scaffold(
 
-      body: currentLocation == null
-      //poboljsat loading screen treba
-      ? const Center(child: Text("Loading"))
-      : GoogleMap(
+      body: GoogleMap(
+        myLocationButtonEnabled: true,
+        myLocationEnabled: true,
         mapType: MapType.normal,
         initialCameraPosition: CameraPosition(
           target: _circlePosition, // camera position to the circle's position
@@ -122,7 +123,7 @@ class MapSampleState extends State<MapSample> {
         markers: markers,
         circles: <Circle>{
           Circle(
-            circleId: const CircleId("player0_circle"),
+            circleId: const CircleId("Zona"),
             center:
                 _circlePosition, // center of the circle to the circle's position(player0 start position)
             radius: _currentCircleRadius * 1000,
@@ -132,8 +133,9 @@ class MapSampleState extends State<MapSample> {
           ),
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => getOtherLocations(),
+        onPressed: getOtherLocations,
         label: const Text('Get locations'),
         icon: const Icon(Icons.gps_fixed),
       ),
@@ -141,29 +143,18 @@ class MapSampleState extends State<MapSample> {
   }
 
 
-  void getCurrentLocation() async {
-    Location location = Location();
-    location.getLocation().then(
-      (location) {
-        currentLocation = location;
-      },
-    );
-
-    location.onLocationChanged.listen(
-      (newLoc) {
-        currentLocation = newLoc;
-        setState(() {});
-      },
-    );
-  }
-
   void sendMyLocation() async {
+    LocationData currentLocation = await Location().getLocation();
+    String myLocation = "${currentLocation.latitude} ${currentLocation.longitude}";
+    
+    List<String> myCoords = myLocation.split(" ");
+    List<Placemark> placemarks = await placemarkFromCoordinates(double.parse(myCoords[0]), double.parse(myCoords[1]));
+    String myAddress = placemarks[0].street ?? "";
 
     Map body = {
       "username": widget.username,
-      "location": "${currentLocation!.latitude!} ${currentLocation!.longitude!}",
-      //mozda dodam address ak mi se bude dalo :/
-      "address": ""
+      "location": myLocation,
+      "address": myAddress
     };
 
     Uri url = Uri.http("${widget.ip}:8000", "locations");

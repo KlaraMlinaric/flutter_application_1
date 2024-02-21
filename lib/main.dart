@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'map.dart';
+import 'package:location/location.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/toast.dart';
@@ -188,14 +189,13 @@ class _MyHomePageState extends State<MyHomePage> {
               nicknameController: _nicknameController,
               codeController: _codeController,
 
-              onPressed: () async{
-                String nickname = _nicknameController.text;
+              onPressed: () async {
+                String username = _nicknameController.text;
                 String ip = _codeController.text;
+
+                LocationData startLoc = await Location().getLocation();
                 String radius = _radiusController.text;
                 String timeInterval = _timeIntervalController.text;
-                  
-                if(radius == "") radius = "0";
-                if(timeInterval == "") timeInterval = "5";
 
                 Map body;
                 Uri url;
@@ -204,14 +204,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 if(_selectedOption == 'Create Game'){
                   url = Uri.http("$ip:8000", "new_game");
                   body = {
-                    "username": nickname,
-                    "timeInterval": timeInterval,
-                    "radius": radius
+                    "username": username,
+                    "startLoc": "${startLoc.latitude} ${startLoc.longitude}",
+                    "radius": radius,
+                    "timeInterval": timeInterval
                   };
                 }else{
                   url = Uri.http("$ip:8000", "join_game");
                   body = {
-                    "username": nickname
+                    "username": username
                   };
                 }
                 
@@ -231,11 +232,13 @@ class _MyHomePageState extends State<MyHomePage> {
                         context,
                         MaterialPageRoute(
                         builder: (context) => MapSample(
-                          username: nickname,
+                          username: username,
                           ip: ip,
-                          seeker: _selectedOption == "Create Game",
-                          radius: settings["radius"],
-                          timeInterval: settings["timeInterval"],
+
+                          startLoc: settings["startLoc"],
+                          radius: double.parse(settings["radius"]),
+                          timeInterval: int.parse(settings["timeInterval"]),
+                          seeker: settings["seeker"]
                           ),
                         ),
                       );
