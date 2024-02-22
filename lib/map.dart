@@ -1,11 +1,11 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
-import 'package:flutter_application_1/toast.dart';
 import 'package:geocoding/geocoding.dart' show Placemark, placemarkFromCoordinates;
+import 'dart:async';
+import 'dart:convert';
+import 'toast.dart';
 
 class MapSample extends StatefulWidget {
 
@@ -123,7 +123,7 @@ class MapSampleState extends State<MapSample> {
         markers: markers,
         circles: <Circle>{
           Circle(
-            circleId: const CircleId("Zona"),
+            circleId: const CircleId("Zone"),
             center:
                 _circlePosition, // center of the circle to the circle's position(player0 start position)
             radius: _currentCircleRadius * 1000,
@@ -162,11 +162,11 @@ class MapSampleState extends State<MapSample> {
     try{
       response = await http.post(url, body: body);
     } catch (err){
-      toast("Server nije pronađen");
+      toast("Server not found");
     }
       
     if(response != null && response.statusCode == 400){
-      toast("Nije moguće poslati lokaciju");
+      toast("Unable to send location");
     }
   }
 
@@ -177,7 +177,7 @@ class MapSampleState extends State<MapSample> {
     try{
       response = await http.get(url);
     } catch (err){
-      toast("Server nije pronađen");
+      toast("Server not found");
     }
 
     if(response != null){
@@ -188,7 +188,7 @@ class MapSampleState extends State<MapSample> {
         });
       }
       else{
-        toast("Nije moguće primiti lokacije");
+        toast("Unable to fetch locations");
       }
     }
   }

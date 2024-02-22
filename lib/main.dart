@@ -1,14 +1,13 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'map.dart';
+import 'package:flutter/services.dart';
 import 'package:location/location.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_application_1/toast.dart';
+import 'dart:convert';
+import 'toast.dart';
+import 'map.dart';
 
-
-// dali se loading opce koristi???
-
+const double fontSize = 20.0;
 
 void main() async {
   WidgetsFlutterBinding
@@ -27,11 +26,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFA1045A)),
-        scaffoldBackgroundColor: const Color(0xff303030),
+        colorSchemeSeed: const Color(0xFFA1045A),
+        scaffoldBackgroundColor: const Color(0xff303030),    
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Ime'),
+      home: const MyHomePage(title: 'Hide&See'),
+      color: const Color(0xffffffff),
     );
   }
 }
@@ -46,9 +46,9 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final TextEditingController _nicknameController = TextEditingController();
-  final TextEditingController _codeController = TextEditingController();
   String _selectedOption = 'Create Game';
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _ipController = TextEditingController();
   final TextEditingController _timeIntervalController = TextEditingController();
   final TextEditingController _radiusController = TextEditingController();
 
@@ -58,6 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: const Color(0xFFA1045A),
+        foregroundColor: Colors.white,
         title: Text(widget.title),
       ),
       body: Center(
@@ -79,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         value,
                         style: const TextStyle(
                           color: Color(0xFFA1045A),
-                          fontSize: 25.0,
+                          fontSize: fontSize,
                         ),
                       ),
                     ),
@@ -90,30 +91,30 @@ class _MyHomePageState extends State<MyHomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: TextField(
-                controller: _nicknameController,
+                controller: _usernameController,
                 decoration: const InputDecoration(
-                  labelText: 'Nickname',
-                  labelStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                  labelText: 'Username',
+                  labelStyle: TextStyle(color: Colors.white, fontSize: fontSize),
                 ),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 25.0,
+                  fontSize: fontSize,
                 ),
               ),
             ),
 
-            // Enter code
+            // Enter ip
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: TextField(
-                controller: _codeController,
+                controller: _ipController,
                 decoration: const InputDecoration(
-                  labelText: 'Enter Code',
-                  labelStyle: TextStyle(color: Colors.white, fontSize: 25.0),
+                  labelText: 'Server IP',
+                  labelStyle: TextStyle(color: Colors.white, fontSize: fontSize),
                 ),
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 25.0,
+                  fontSize: fontSize,
                 ),
               ),
             ),
@@ -142,16 +143,19 @@ class _MyHomePageState extends State<MyHomePage> {
                             horizontal: 20.0, vertical: 10.0),
                         child: TextField(
                           controller: _timeIntervalController,
-                          keyboardType: TextInputType.number,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: false),
                           decoration: const InputDecoration(
                             labelText: 'Time Interval (minutes)',
                             labelStyle:
-                                TextStyle(color: Colors.white, fontSize: 20.0),
+                                TextStyle(color: Colors.white, fontSize: fontSize),
                           ),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 20.0,
+                            fontSize: fontSize,
                           ),
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ], 
                         ),
                       ),
 
@@ -162,16 +166,24 @@ class _MyHomePageState extends State<MyHomePage> {
                             horizontal: 20.0, vertical: 10.0),
                         child: TextField(
                           controller: _radiusController,
-                          keyboardType: TextInputType.number,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           decoration: const InputDecoration(
                             labelText: 'Radius (kilometers)',
                             labelStyle:
-                                TextStyle(color: Colors.white, fontSize: 20.0),
+                                TextStyle(color: Colors.white, fontSize: fontSize),
                           ),
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 20.0,
+                            fontSize: fontSize,
                           ),
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]+[,.]{0,1}[0-9]*')),
+                            TextInputFormatter.withFunction(
+                              (oldValue, newValue) => newValue.copyWith(
+                                text: newValue.text.replaceAll(',', '.'),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 10.0),
@@ -183,15 +195,15 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(
               height: 20.0,
               width: 300,
-            ), // Padding for enter code bar
+            ), // Padding for enter IP bar
 
             StartButton(
-              nicknameController: _nicknameController,
-              codeController: _codeController,
+              usernameController: _usernameController,
+              ipController: _ipController,
 
               onPressed: () async {
-                String username = _nicknameController.text;
-                String ip = _codeController.text;
+                String username = _usernameController.text;
+                String ip = _ipController.text;
 
                 LocationData startLoc = await Location().getLocation();
                 String radius = _radiusController.text;
@@ -219,14 +231,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 try {
                   response = await http.post(url, body: body);
                 } catch(err) {
-                  toast("Server nije pronađen");
+                  toast("Server not found");
                 }
 
                 if(response != null){
                   switch(response.statusCode){
                     case 200: {
                       Map settings = jsonDecode(response.body);
-
+                      //ako je settings null onda nema gamea
                       if (!mounted) return;
                       Navigator.push(
                         context,
@@ -246,12 +258,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     break;
 
                     case 400: {
-                      toast("Ime se već koristi");
+                      toast("Name already in use");
                     }
                     break;
 
                     default: {
-                      toast("Nepoznati problem");
+                      toast("Unknown error");
                     }
                     break;
                   }
@@ -266,14 +278,14 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class StartButton extends StatelessWidget {
-  final TextEditingController nicknameController;
-  final TextEditingController codeController;
+  final TextEditingController usernameController;
+  final TextEditingController ipController;
   final VoidCallback onPressed;
 
   const StartButton({
     super.key,
-    required this.nicknameController,
-    required this.codeController,
+    required this.usernameController,
+    required this.ipController,
     required this.onPressed,
   });
 
@@ -284,7 +296,7 @@ class StartButton extends StatelessWidget {
       child: const Text(
         'Start Game',
         style: TextStyle(
-          fontSize: 25.0,
+          fontSize: fontSize,
         ),
       ),
     );
