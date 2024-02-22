@@ -70,7 +70,7 @@ class MapSampleState extends State<MapSample> {
     _circlePosition = LatLng(double.parse(coords[0]), double.parse(coords[1]));
 
     
-    Timer.periodic(const Duration(seconds: 10), (Timer timer) async{
+    Timer.periodic(Duration(minutes: widget.timeInterval), (Timer timer) async{
       // call function to update user locations
       sendMyLocation();
     });

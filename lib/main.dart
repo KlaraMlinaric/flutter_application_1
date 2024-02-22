@@ -258,7 +258,31 @@ class _MyHomePageState extends State<MyHomePage> {
                     break;
 
                     case 400: {
-                      toast("Name already in use");
+                      if(_selectedOption == 'Create Game'){
+                        if(username == ""){
+                          toast("Username is required");
+                        }
+                        else if(timeInterval == ""){
+                          toast("Time interval is required");
+                        }
+                        else if(radius == ""){
+                          toast("Radius is required");
+                        }
+                      }
+
+                      else{
+                        if(username == ""){
+                          toast("Username is required");
+                        }
+                        else{
+                          toast("Game not started yet");
+                        }
+                      }
+                    }
+                    break;
+
+                    case 409:{
+                      toast("Name already ni use");
                     }
                     break;
 
